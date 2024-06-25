@@ -1,4 +1,4 @@
-local root = menu.my_root() -- Racine du menu
+local root = menu.my_root() 
  
 local settings = {
     bridge_height = 100.0,
@@ -8,8 +8,6 @@ local settings = {
     bell_curve_scale = 1.0,
     peak_distance_scale = 0.15
 }
-
-
 
 local ligneSettings = menu.list(root, "Paramètres de ligne", {}, "")
 

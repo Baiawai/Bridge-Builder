@@ -5,7 +5,7 @@ local file_path = filesystem.stand_dir() .. json_file_path
 local map_datas = {}
 local loadJson = {}
 
--- Fonction pour charger le fichier JSON avec tentatives
+-- Function to load JSON file with attempts
 function loadJson.loadJSON(max_attempts)
     max_attempts = max_attempts or 3
     local attempts = 0
@@ -36,15 +36,15 @@ function loadJson.loadJSON(max_attempts)
     end
 end
 
--- Fonction pour obtenir la hauteur depuis le JSON
+-- Function to get height from JSON
 function loadJson.getHeightFromJson(x, y)
     local key = tostring(math.floor(x / 50) * 50) .. "," .. tostring(math.floor(y / 50) * 50)
     return map_datas[key] or 0.0
 end
 
--- Fonction pour obtenir les coordonnées du waypoint
+-- Function to get waypoint coordinates
 function loadJson.getWaypointCoords()
-    local blip = GET_FIRST_BLIP_INFO_ID(8) -- 8 est l'ID pour les waypoints
+    local blip = GET_FIRST_BLIP_INFO_ID(8)
     if DOES_BLIP_EXIST(blip) then
         local coord = GET_BLIP_INFO_ID_COORD(blip)
         return coord.x, coord.y, coord.z

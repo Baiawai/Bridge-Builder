@@ -1,8 +1,8 @@
 local bridge = {}
   
-local bridge_fragments = {} -- Table pour stocker les fragments de pont
-local base_created = false -- Variable pour vérifier si la base du pont a été créée
-local last_fragment = nil -- Variable pour stocker le dernier fragment créé
+local bridge_fragments = {} 
+local base_created = false 
+local last_fragment = nil 
 
 function bridge.create_bridge(model, x, y, z, rotX, rotY, rotZ)
     REQUEST_MODEL(util.joaat(model))
@@ -108,12 +108,12 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
             local angle_difference = pitch2 - pitch1
             
             local bridge_select = bridge.create_bridge(bridge_model, x, y, z, 0, 0.0, 0.0)
-            local prev_bridge = last_fragment -- Utilise le dernier fragment créé
+            local prev_bridge = last_fragment 
 
             bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7 - angle_difference , 0,  + angle_difference, 0.0)
             table.insert(bridge_fragments, bridge_select)
 
-            last_fragment = bridge_select -- Met à jour le dernier fragment créé
+            last_fragment = bridge_select
             pitch1 = pitch2
         end
 
@@ -131,12 +131,12 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
             local new_z = last_point.z + (deltaZ / distance_to_final) * fragment_length
 
             local bridge_select = bridge.create_bridge(bridge_model, new_x, new_y, new_z, 0, 0.0, 0.0)
-            local prev_bridge = last_fragment -- Utilise le dernier fragment créé
+            local prev_bridge = last_fragment 
 
             bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7, 0, 0.0, 0.0)
             table.insert(bridge_fragments, bridge_select)
 
-            last_fragment = bridge_select -- Met à jour le dernier fragment créé
+            last_fragment = bridge_select 
             last_point = { x = new_x, y = new_y, z = new_z }
 
             -- Recalculate distance to final point
@@ -148,12 +148,12 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
 
         -- Create the final segment
         local bridge_select = bridge.create_bridge(bridge_model, final_point.x, final_point.y, final_point.z, 0, 0.0, 0.0)
-        local prev_bridge = last_fragment -- Utilise le dernier fragment créé
+        local prev_bridge = last_fragment 
 
         bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7, 0, 0.0, 0.0)
         table.insert(bridge_fragments, bridge_select)
 
-        last_fragment = bridge_select -- Met à jour le dernier fragment créé
+        last_fragment = bridge_select 
     end
 end
 
@@ -166,7 +166,7 @@ function bridge.delete_fragments()
     end
     base_created = false
     bridge_fragments = {} 
-    last_fragment = nil -- Réinitialise le dernier fragment
+    last_fragment = nil 
 end
 
 return bridge

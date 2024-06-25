@@ -1,32 +1,30 @@
 util.require_natives("3095a", "g")
-local root = menu.my_root() -- Racine du menu
+local root = menu.my_root()
  
--- Charger les modules
+-- Load modules
 local status, loadJson = pcall(require, "resources.bridge-builder-resources.loadJson")
 if not status then
-    util.toast("Failed to load resources.bridge-builder-resources.loadJson: " .. loadJson, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.loadJson ")
     return
 end
 
 local status, bridge = pcall(require, "resources.bridge-builder-resources.bridge")
 if not status then
-    util.toast("Failed to load resources.bridge-builder-resources.bridge: " .. bridge, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.bridge ")
     return
 end
 
 local status, bridge_utils = pcall(require, "resources.bridge-builder-resources.bridge_utils")
 if not status then
-    util.toast("Failed to load resources.bridge-builder-resources.bridge_utils: " .. bridge_utils, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.bridge_utils ")
     return
 end
 local bridge = require("resources.bridge-builder-resources.bridge")
 local bridge_utils = require("resources.bridge-builder-resources.bridge_utils")
 
-local fragement_i = 117.09867095947
-local fragement_w = 27.463836669922
-local fragement_h = 62.161010742188
 
-local fragemnt_center = fragement_h / 2
+-- Global Variables
+local fragemnt_center = 62.161010742188 / 2
 local fragment_length = 108
 
 local bridge_model = "xs_combined_dystopian_14_brdg01"
@@ -37,6 +35,8 @@ local default_bell_curve_scale = 1.0
 local default_peak_distance_scale = 0.15
 local num_segments = 10
 local num_step = 0
+local bridge_type = "Topographic"
+local show_draw_line = false
 
 local bridge_height = default_bridge_height
 local max_flat_distance = default_max_flat_distance
@@ -44,17 +44,15 @@ local fluctuation_tolerance = default_fluctuation_tolerance
 local bell_curve_scale = default_bell_curve_scale
 local peak_distance_scale = default_peak_distance_scale
 
+local bridge_points = {}
 local start_coords = {}
 local end_coords = {}
 local coords_defined = false
 local distance_between_points = 0.0
-local show_draw_line = false
 
-local bridge_type = "Topographic"
-
+-- Load the json which contains the topography of the map
 loadJson.loadJSON()
 
-local bridge_points = {}
 function createPathRespectingTopography(x1, y1, x2, y2, z1, z2)
     bridge_points = {}
     local total_distance = math.sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
@@ -69,7 +67,7 @@ function createPathRespectingTopography(x1, y1, x2, y2, z1, z2)
         local z = z1 + (dz * i)
         local distance = math.sqrt((x - x1)^2 + (y - y1)^2 + (z - z1)^2)
 
-        -- Vérifiez les distances pour voir si les paramètres sont correctement appliqués
+        -- Check distances to see if settings are applied correctly
         if distance < total_distance * peak_distance_scale then
             z = loadJson.getHeightFromJson(x, y) + (distance / (total_distance * peak_distance_scale)) * (bridge_height * bell_curve_scale)
         elseif distance < total_distance * (peak_distance_scale + max_flat_distance / total_distance) then
@@ -84,6 +82,7 @@ function createPathRespectingTopography(x1, y1, x2, y2, z1, z2)
 
     bridge_points = bridge_utils.smoothData(bridge_points, fluctuation_tolerance)
 end
+
 function createFlatPath(x1, y1, x2, y2, z1, z2)
     bridge_points = {}
     local total_distance = math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -144,7 +143,6 @@ function createFlatPath(x1, y1, x2, y2, z1, z2)
     bridge_points = bridge_utils.smoothData(bridge_points, fluctuation_tolerance)
 end
 
-
 function createCurvePath(x1, y1, x2, y2, z1, z2)
     bridge_points = {}
     local total_distance = math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -153,7 +151,7 @@ function createCurvePath(x1, y1, x2, y2, z1, z2)
     local dy = (y2 - y1) / num_segments
     num_step = num_segments
 
-    -- Trouver la hauteur maximale sur le chemin
+    -- Find the maximum height on the path
     local highest_terrain_z = math.max(z1, z2)
     local peak_segment = math.floor(num_segments / 2)  -- Initial assumption for peak segment
     for i = 0, num_segments do
@@ -166,16 +164,16 @@ function createCurvePath(x1, y1, x2, y2, z1, z2)
         end
     end
 
-    -- Calculer la hauteur du point le plus haut du pont
+    -- Calculate the height of the highest point of the bridge
     local highest_point_z = math.max(highest_terrain_z + bridge_height, bridge_height)
     local middle_index = peak_segment
 
-    -- Recalculer le nombre de segments
+    -- Recalculate the number of segments
     local ascend_segments = middle_index
     local descend_segments = num_segments - middle_index
-    local middle_segments = 1  -- Assurer qu'il y ait au moins un segment plat
+    local middle_segments = 1  
 
-    -- Partie ascendante de la courbe
+    -- Ascending part of the curve
     for i = 0, ascend_segments do
         local x = x1 + dx * i
         local y = y1 + dy * i
@@ -184,13 +182,13 @@ function createCurvePath(x1, y1, x2, y2, z1, z2)
         table.insert(bridge_points, {x = x, y = y, z = z})
     end
 
-    -- Partie plate au milieu de la courbe
+    -- Flat part in the middle of the curve
     local flat_x = x1 + dx * (ascend_segments + 1)
     local flat_y = y1 + dy * (ascend_segments + 1)
     local flat_z = highest_point_z
     table.insert(bridge_points, {x = flat_x, y = flat_y, z = flat_z})
 
-    -- Partie descendante de la courbe
+    -- Descending part of the curve
     for i = 1, descend_segments do
         local x = flat_x + dx * i
         local y = flat_y + dy * i
@@ -202,13 +200,8 @@ function createCurvePath(x1, y1, x2, y2, z1, z2)
     bridge_points = bridge_utils.smoothData(bridge_points, fluctuation_tolerance)
 end
 
-
-
-
-
-
 function drawBridgePath()
-    local segment_index = 0  -- Variable globale pour garder une trace du segment actuel
+    local segment_index = 0  -- Global variable to keep track of current segment
     for i = 1, #bridge_points - 1 do
         local p1 = bridge_points[i]
         local p2 = bridge_points[i + 1]
@@ -226,7 +219,7 @@ function drawBridgePath()
             local z2 = bridge_utils.lerp(p1.z, p2.z, t2)
 
             
-            -- Couleurs alternantes : rouge (255, 0, 0, 255) et orange (255, 165, 0, 255)
+            -- Alternating colors: red (255, 0, 0, 255) and orange (255, 165, 0, 255)
             if show_draw_line then 
                 if segment_index % 2 == 0 then
                     bridge_utils.drawLine(x1, y1, z1, x2, y2, z2, 255, 0, 0, 255)
@@ -238,14 +231,15 @@ function drawBridgePath()
         end
     end
 end
+
 function createPath(x1, y1, x2, y2, z1, z2)
     if not start_coords.x or not start_coords.y or not start_coords.z then
-        util.toast("Start coordinates are not defined", util.toast_config_get_flags(tc))
+        util.toast("Start coordinates are not defined")
         return
     end
 
     if not end_coords.x or not end_coords.y or not end_coords.z then
-        util.toast("End coordinates are not defined", util.toast_config_get_flags(tc))
+        util.toast("End coordinates are not defined")
         return
     end
 
@@ -297,7 +291,6 @@ local peak_setting_base = menu.slider(construction_settings, "Climb distance sca
     set_valueBridgeSettings()
 end)
 
--- Add bridge type selection
 local bridge_menu_type = menu.list_select(root, "Bridge Type", {}, "Select the type of bridge construction.", {
     {1, "Topographic"},
     {2, "Flat"},
@@ -408,7 +401,6 @@ local segment_item = menu.readonly(bridgeInfoMenu, "Number of segments", "0")
 local total_points_item = menu.readonly(bridgeInfoMenu, "Total number of points", "0")
 local bridge_type_item = menu.readonly(bridgeInfoMenu, "Bridge type", "Topographic")
 
-
 local bridgeSettings = menu.list(root, lang.find("Settings", "en"), {}, "")
 
 local height_setting = menu.slider(bridgeSettings, lang.find("Height", "en"), {}, "Adjust the height of the bridge above the ground.", 0, 1000, default_bridge_height, 10, function(value)
@@ -478,14 +470,6 @@ function hide_submenu()
     submenu_active = false
 end
 
-function calculateAverageHeight()
-    local total_height = 0
-    for _, point in ipairs(bridge_points) do
-        total_height = total_height + point.z
-    end
-    return total_height / #bridge_points
-end
-
 function set_valueMenu()
     if distance_item then
         menu.set_value(distance_item, string.format("%.2f", distance_between_points))
@@ -494,7 +478,7 @@ function set_valueMenu()
         menu.set_value(segment_item, tostring(num_step))
     end
     if avg_height_item then
-        menu.set_value(avg_height_item, string.format("%.2f", calculateAverageHeight()))
+        menu.set_value(avg_height_item, string.format("%.2f", bridge_utils.calculateAverageHeight(bridge_points)))
     end
     if total_points_item then
         menu.set_value(total_points_item, tostring(#bridge_points))
@@ -509,6 +493,5 @@ function set_valueMenu()
         menu.set_value(pointB_coords_item, string.format("X: %.2f, Y: %.2f, Z: %.2f", end_coords.x, end_coords.y, end_coords.z))
     end
 end
-
 
 hide_submenu()

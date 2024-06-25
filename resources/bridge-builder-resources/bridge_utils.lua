@@ -29,4 +29,12 @@ function bridge_utils.smoothData(points, tolerance)
     return smoothed_points
 end
 
+function bridge_utils.calculateAverageHeight(bridge_points)
+    local total_height = 0
+    for _, point in ipairs(bridge_points) do
+        total_height = total_height + point.z
+    end
+    return total_height / #bridge_points
+end
+
 return bridge_utils
