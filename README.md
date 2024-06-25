@@ -1,6 +1,6 @@
 # Bridge Builder
 
-Bridge Builder is a tool for creating bridges in a 3D environment within GTA5. This project allows for the creation of various types of bridges (topographic, flat, curved) while respecting the terrain's topography. It uses modules to load terrain data and create path points for bridge construction. The script utilizes the Stand Lua API, and GTA5's natives .
+Bridge Builder is a tool for creating bridges in GTA5. This project allows for the creation of various types of bridges (topographic, flat, curved) while respecting the terrain's topography. It uses modules to load terrain data and create path points for bridge construction. The script utilizes the Stand Lua API, and GTA5's natives .
 
 ## Features
 
@@ -12,27 +12,11 @@ Bridge Builder is a tool for creating bridges in a 3D environment within GTA5. T
 
 ## Prerequisites
 
-- [Git](https://git-scm.com/) installed on your machine.
+- [Git](https://git-scm.com/) installed on your machine, and download this repository.
+or
+- Directly download this Lua script for Stand with this [zip](link_to_zip).
+- Place the Lua script and the "resources" folder in the "stand/Lua Scripts" directory.
 
-## Installation
-
-1. Clone the GitHub repository to your local machine:
-
-    ```sh
-    git clone https://github.com/Baiawai/Bridge-Builder.git
-    ```
-
-2. Navigate to the project directory:
-
-    ```sh
-    cd "C:\Users\gaelp\AppData\Roaming\Stand\Lua Scripts\Bridge Generator\Bridge Builder"
-    ```
-
-3. Initialize the Git repository (if not already done):
-
-    ```sh
-    git init
-    ```
 
 ## Usage
 
