@@ -2,25 +2,25 @@ util.require_natives("3095a", "g")
 local root = menu.my_root() -- Racine du menu
  
 -- Charger les modules
-local status, loadJson = pcall(require, "resources.loadJson")
+local status, loadJson = pcall(require, "resources.bridge-builder-resources.loadJson")
 if not status then
-    util.toast("Failed to load resources.loadJson: " .. loadJson, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.loadJson: " .. loadJson, util.toast_config_get_flags(tc))
     return
 end
 
-local status, bridge = pcall(require, "resources.bridge")
+local status, bridge = pcall(require, "resources.bridge-builder-resources.bridge")
 if not status then
-    util.toast("Failed to load resources.bridge: " .. bridge, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.bridge: " .. bridge, util.toast_config_get_flags(tc))
     return
 end
 
-local status, bridge_utils = pcall(require, "resources.bridge_utils")
+local status, bridge_utils = pcall(require, "resources.bridge-builder-resources.bridge_utils")
 if not status then
-    util.toast("Failed to load resources.bridge_utils: " .. bridge_utils, util.toast_config_get_flags(tc))
+    util.toast("Failed to load resources.bridge-builder-resources.bridge_utils: " .. bridge_utils, util.toast_config_get_flags(tc))
     return
 end
-local bridge = require("resources.bridge")
-local bridge_utils = require("resources.bridge_utils")
+local bridge = require("resources.bridge-builder-resources.bridge")
+local bridge_utils = require("resources.bridge-builder-resources.bridge_utils")
 
 local fragement_i = 117.09867095947
 local fragement_w = 27.463836669922

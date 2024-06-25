@@ -1,10 +1,8 @@
 local json = require("json")
-local RACINE_DIR = filesystem.stand_dir() .. 'Lua Scripts\\'
-local json_file_path = "map_data.json"
- 
-local file_path = RACINE_DIR .. json_file_path
-local map_datas = {}
+local json_file_path = "Lua Scripts\\resources\\bridge-builder-resources\\map_data.json"
+local file_path = filesystem.stand_dir() .. json_file_path
 
+local map_datas = {}
 local loadJson = {}
 
 -- Fonction pour charger le fichier JSON avec tentatives
