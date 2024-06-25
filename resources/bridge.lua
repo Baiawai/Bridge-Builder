@@ -1,5 +1,5 @@
 local bridge = {}
-
+  
 local bridge_fragments = {} -- Table pour stocker les fragments de pont
 local base_created = false -- Variable pour vérifier si la base du pont a été créée
 local last_fragment = nil -- Variable pour stocker le dernier fragment créé

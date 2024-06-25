@@ -1,5 +1,5 @@
 local root = menu.my_root() -- Racine du menu
-
+ 
 local settings = {
     bridge_height = 100.0,
     max_flat_distance = 100.0,
