@@ -50,6 +50,8 @@ local end_coords = {}
 local coords_defined = false
 local distance_between_points = 0.0
 
+local is_creating_bridge = false
+
 -- Load the json which contains the topography of the map
 loadJson.loadJSON()
 
@@ -255,15 +257,21 @@ end
 function redrawBridgePath()
     if start_coords.x and start_coords.y and start_coords.z and end_coords.x and end_coords.y and end_coords.z then
         
-        distance_between_points = math.sqrt((end_coords.x - start_coords.x)^2 + (end_coords.y - start_coords.y)^2) * 0.85
+       
 
         createPath(start_coords.x, start_coords.y, end_coords.x, end_coords.y, start_coords.z, end_coords.z)
         drawBridgePath()
-        set_valueMenu()
+      
+  
         if coords_defined then
-            bridge.delete_fragments()
-            bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length)
+            distance_between_points = math.sqrt((end_coords.x - start_coords.x)^2 + (end_coords.y - start_coords.y)^2) * 0.85
+            if distance_between_points != nil then
+                bridge.delete_fragments()
+                bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length, distance_between_points)
+                is_creating_bridge = true
+            end
         end
+        set_valueMenu()
     end
 end
 
@@ -321,12 +329,13 @@ local toggle_menu_loop = menu.toggle_loop(root, "Start building the bridge", {},
             updateMaxFlatDistance()
             distance_between_points = math.sqrt((end_coords.x - start_coords.x)^2 + (end_coords.y - start_coords.y)^2) * 0.85
 
-            util.toast(distance_between_points)
             createPathRespectingTopography(start_coords.x, start_coords.y, end_coords.x, end_coords.y, start_coords.z, end_coords.z)
 
             set_valueMenu()
-
-            bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length)
+            if not is_creating_bridge then
+                bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length, distance_between_points)
+                is_creating_bridge = true
+            end
             update_menu_name(true)
         else
             util.toast("Please place a waypoint on the map.")
@@ -352,7 +361,7 @@ end, function()
     num_segments = 10
     num_step = 0
     coords_defined = false
-    base_created = false
+    is_creating_bridge = false
     bridge_points = {}
     start_coords = {}
     end_coords = {}

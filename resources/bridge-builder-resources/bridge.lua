@@ -3,6 +3,7 @@ local bridge = {}
 local bridge_fragments = {} 
 local base_created = false 
 local last_fragment = nil 
+local is_creating_bridge = false
 
 function bridge.create_bridge(model, x, y, z, rotX, rotY, rotZ)
     REQUEST_MODEL(util.joaat(model))
@@ -49,11 +50,15 @@ function bridge.attach_bridge(parent, child, offsetX, offsetY, offsetZ, rotX, ro
     SET_ENTITY_LOAD_COLLISION_FLAG(child, true, 0)
 end
 
-function bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length)
-    if base_created then
+
+
+function bridge.create_initial_fragment(bridge_model, bridge_points, fragment_length, distance_between_points)
+    if base_created or is_creating_bridge then
         return
     end
 
+    is_creating_bridge = true
+    local total_distance = 0
     if #bridge_points > 1 then
         local point = bridge_points[1]
         local next_point = bridge_points[2]
@@ -64,7 +69,8 @@ function bridge.create_initial_fragment(bridge_model, bridge_points, fragment_le
         local deltaZ = next_point.z - z
         local yaw = math.deg(math.atan2(deltaY, deltaX))
         local distanceXY = math.sqrt(deltaX^2 + deltaY^2)
-        local pitch = -math.deg(math.atan2(deltaZ, distanceXY)) + 8.5  
+        total_distance = total_distance + distanceXY
+        local pitch = -math.deg(math.atan2(deltaZ, distanceXY)) + 8.5
 
         local offsetX = (fragment_length / 2) * math.cos(math.rad(yaw))
         local offsetY = (fragment_length / 2) * math.sin(math.rad(yaw))
@@ -82,6 +88,10 @@ function bridge.create_initial_fragment(bridge_model, bridge_points, fragment_le
 
         bridge.create_following_fragments(bridge_points, bridge_model, fragment_length)
     end
+
+    local formatted_distance = string.format("%.2f", distance_between_points)
+    util.toast(#bridge_fragments .. " fragments used for a distance of " .. formatted_distance .. " meters.")
+    is_creating_bridge = false
 end
 
 function bridge.create_following_fragments(bridge_points, bridge_model, fragment_length)
@@ -113,8 +123,15 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
             bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7 - angle_difference , 0,  + angle_difference, 0.0)
             table.insert(bridge_fragments, bridge_select)
 
-            last_fragment = bridge_select
-            pitch1 = pitch2
+            -- Vérifiez si l'attachement est réussi avant de mettre à jour last_fragment
+            if DOES_ENTITY_EXIST(bridge_select) then
+                table.insert(bridge_fragments, bridge_select)
+                last_fragment = bridge_select
+                pitch1 = pitch2
+            else
+                print("Erreur: L'attachement du segment de pont a échoué.")
+            end
+      
         end
 
         -- Check if the last fragment is close enough to the final point
@@ -136,9 +153,16 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
             bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7, 0, 0.0, 0.0)
             table.insert(bridge_fragments, bridge_select)
 
-            last_fragment = bridge_select 
-            last_point = { x = new_x, y = new_y, z = new_z }
 
+            -- Vérifiez si l'attachement est réussi avant de mettre à jour last_fragment
+            if DOES_ENTITY_EXIST(bridge_select) then
+                table.insert(bridge_fragments, bridge_select)
+                last_fragment = bridge_select 
+                last_point = { x = new_x, y = new_y, z = new_z }
+            else
+                print("Erreur: L'attachement du segment de pont a échoué.")
+            end
+           
             -- Recalculate distance to final point
             deltaX = final_point.x - last_point.x
             deltaY = final_point.y - last_point.y
@@ -153,7 +177,13 @@ function bridge.create_following_fragments(bridge_points, bridge_model, fragment
         bridge.attach_bridge(prev_bridge, bridge_select, fragment_length, 0, 15.7, 0, 0.0, 0.0)
         table.insert(bridge_fragments, bridge_select)
 
-        last_fragment = bridge_select 
+        -- Vérifiez si l'attachement est réussi avant de mettre à jour last_fragment
+        if DOES_ENTITY_EXIST(bridge_select) then
+            table.insert(bridge_fragments, bridge_select)
+            last_fragment = bridge_select 
+        else
+            print("Erreur: L'attachement du segment de pont a échoué.")
+        end
     end
 end
 
